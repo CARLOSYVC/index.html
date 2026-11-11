@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Puertas Ventanas & Mas - Contrato Digital</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#0267B5',
+              darkblue: '#0b396b',
+              red: '#B71C1C',
+              darkred: '#7F0000',
+              cream: '#F8FAFC'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --zone-gap: 8px;
+      --zone-header-title: 19px;
+      --zone-client-font: 11.5px;
+      --zone-items-font: 12px;
+      --zone-items-desc-height: 64px;
+      --zone-financial-font: 11.5px;
+      --zone-conditions-font: 8.2px;
+      --zone-conditions-line: 1.22;
+      --zone-sig-height: 56px;
+      --zone-footer-font: 8.5px;
+    }
+
+    .print-only {
+      display: none !important;
+    }
+
+    .movable-section {
+      position: relative;
+      margin-bottom: var(--zone-gap);
+      transition: transform 0.15s ease, margin 0.1s ease, padding 0.1s ease;
+    }
+    .title-print { font-size: var(--zone-header-title) !important; }
+    #sec_client input, #sec_client label, #sec_client .print-only { font-size: var(--zone-client-font) !important; }
+    #sec_items textarea { font-size: var(--zone-items-font) !important; min-height: var(--zone-items-desc-height) !important; }
+    #col_financial { font-size: var(--zone-financial-font) !important; }
+    .conditions-list-print { font-size: var(--zone-conditions-font) !important; line-height: var(--zone-conditions-line) !important; }
+    .sig-canvas-container { height: var(--zone-sig-height) !important; }
+    #editableFooterText { font-size: var(--zone-footer-font) !important; }
+
+    .coupled-section {
+      margin-bottom: 0px !important;
+      border-bottom: none !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    .coupled-section + .movable-section {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      margin-top: 0 !important;
+    }
+    .attachment-area {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    .editable-area {
+      outline: none;
+      border-radius: 3px;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease;
+      cursor: text;
+    }
+    body:not(.preview-mode):not(.client-mode) .editable-area:hover {
+      background-color: rgba(2, 103, 181, 0.08);
+      box-shadow: 0 0 0 1px rgba(2, 103, 181, 0.35);
+    }
+    body:not(.preview-mode):not(.client-mode) .editable-area:focus {
+      background-color: rgba(2, 103, 181, 0.12);
+      box-shadow: 0 0 0 2px #0267B5;
+    }
+    body.preview-mode .editable-area, body.client-mode .editable-area {
+      cursor: default;
+      background: transparent !important;
+      box-shadow: none !important;
+      pointer-events: none;
+    }
+
+    body:not(.preview-mode):not(.client-mode) .movable-section:hover {
+      outline: 1.5px dashed rgba(2, 103, 181, 0.4);
+      outline-offset: 2px;
+    }
+    .movable-section.is-dragging {
+      opacity: 0.35 !important;
+      outline: 2px dashed #0267B5 !important;
+    }
+    .section-move-bar { border-bottom: 1px solid #cbd5e1; }
+    .section-drag-handle:hover { color: #0267B5; }
+    .zone-quick-btn {
+      padding: 1px 5px;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      transition: all 0.15s;
+    }
+    .zone-quick-btn:hover { background: #e2e8f0; color: #0267B5; }
+
+    body.preview-mode .section-move-bar,
+    body.preview-mode .section-resize-handle,
+    body.preview-mode .preview-hide,
+    body.client-mode .section-move-bar,
+    body.client-mode .section-resize-handle,
+    body.client-mode .preview-hide,
+    body.client-mode header {
+      display: none !important;
+    }
+
+    .preview-actions-bar { display: none !important; }
+    body.preview-mode .preview-actions-bar { display: flex !important; }
+    body.preview-mode .conditions-scroll-box,
+    body.client-mode .conditions-scroll-box {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    /* MODO CLIENTE: Bloqueo de elementos y ajustes visuales */
+    body.client-mode .print-only { display: block !important; }
+    body.client-mode span.print-only { display: inline !important; }
+    body.client-mode #col_sig_delivery { display: none !important; }
+    body.client-mode #signaturesGrid { grid-template-columns: 1fr !important; }
+    body.client-mode #col_sig_client {
+      border: 2px solid #0267B5 !important;
+      background-color: #f8fafc !important;
+      box-shadow: 0 4px 12px rgba(2, 103, 181, 0.12) !important;
+    }
+    body.client-mode #col_sig_client .sig-canvas-container {
+      height: 90px !important;
+      background-color: #ffffff !important;
+      border: 2px dashed #0267B5 !important;
+    }
+    body.client-mode #contractSheet {
+      margin-bottom: 90px !important;
+    }
+
+    @media screen {
+      .contract-container {
+        width: 100%;
+        max-width: 816px !important;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-sizing: border-box;
+        position: relative;
+      }
+      .contract-container.paper-legal { min-height: 1344px !important; }
+      .contract-container.paper-letter { min-height: 1056px !important; }
+      body.preview-mode { background-color: #cbd5e1; }
+      body.preview-mode .contract-container {
+        margin: 12px auto;
+        box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.25);
+      }
+      body.preview-mode .print-only { display: block !important; }
+      body.preview-mode span.print-only { display: inline !important; }
+    }
+
+    @media print {
+      *, *::before, *::after { box-sizing: border-box !important; }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 8.8px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print, .section-move-bar, .section-resize-handle, .preview-actions-bar, #clientBottomBar {
+        display: none !important;
+      }
+      .print-only { display: block !important; }
+      span.print-only { display: inline !important; }
+      .contract-container, .contract-container.paper-legal, .contract-container.paper-letter {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+      }
+      .movable-section {
+        outline: none !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: var(--zone-gap) !important;
+      }
+      .header-row-print {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
+      .client-grid-print {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+      }
+      .fin-cond-grid-print {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        align-items: start !important;
+      }
+      #col_financial { grid-column: span 5 / span 5 !important; }
+      #col_conditions { grid-column: span 7 / span 7 !important; }
+      .conditions-scroll-box { max-height: none !important; overflow: visible !important; }
+      .conditions-list-print {
+        columns: 2 !important;
+        column-gap: 10px !important;
+        font-size: var(--zone-conditions-font) !important;
+        line-height: var(--zone-conditions-line) !important;
+      }
+      .signatures-row-print {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+      }
+      .sig-canvas-container { height: 48px !important; }
+    }
+
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+  <style id="dynamicPageStyle">
+    @media print {
+      @page {
+        margin: 5mm 6mm;
+        size: legal portrait;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen antialiased">
+
+  <!-- BARRA DE HERRAMIENTAS SUPERIOR (ADMIN / TALLER) -->
+  <header class="no-print sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-blue to-brand-red flex items-center justify-center text-white font-black text-base shadow">
+          Cv
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-slate-900 text-sm leading-tight">CV Puertas Ventanas &amp; Mas</h1>
+            <span id="headerPaperBadge" class="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-50 text-brand-darkblue border border-blue-200">
+              <i class="fa-solid fa-file-invoice text-brand-blue"></i> <span id="lblHeaderPaper">Papel Legal (8.5” x 14”)</span>
+            </span>
+          </div>
+          <p class="text-[10.5px] text-slate-500 font-medium">
+            <i class="fa-solid fa-location-dot text-brand-red mr-1"></i>Las Piedras, PR &bull; 
+            <i class="fa-solid fa-phone text-brand-blue mr-1"></i>787-242-8699
+          </p>
+        </div>
+      </div>
+      
+      <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
+        <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-300 shadow-xs">
+          <span class="text-[10px] font-extrabold text-slate-600 px-1.5 hidden sm:inline"><i class="fa-solid fa-scroll text-brand-blue mr-1"></i>Papel:</span>
+          <button type="button" id="btnPaperLegal" onclick="setPaperSize('legal')" class="px-2 py-1 text-[11px] font-black rounded-md bg-brand-blue text-white shadow-xs transition">
+            Legal (8.5"x14")
+          </button>
+          <button type="button" id="btnPaperLetter" onclick="setPaperSize('letter')" class="px-2 py-1 text-[11px] font-bold rounded-md text-slate-700 hover:bg-slate-200 transition">
+            Carta (8.5"x11")
+          </button>
+        </div>
+
+        <button type="button" onclick="loadSampleData()" class="preview-hide px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 transition flex items-center gap-1 shadow-sm">
+          <i class="fa-solid fa-file-import text-brand-blue"></i> Muestra
+        </button>
+        <button type="button" onclick="clearContract()" class="preview-hide px-2.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition flex items-center gap-1 shadow-sm">
+          <i class="fa-solid fa-rotate-left text-rose-500"></i> Limpiar
+        </button>
+        <button type="button" onclick="resetSectionOrder()" class="preview-hide px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg shadow-sm transition flex items-center gap-1">
+          <i class="fa-solid fa-arrows-rotate text-emerald-600"></i> Orden
+        </button>
+        <button type="button" id="btnToggleSizePanel" onclick="toggleSizePanel()" class="preview-hide px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg shadow-sm transition flex items-center gap-1">
+          <i class="fa-solid fa-sliders text-indigo-600"></i> Tamaños
+        </button>
+
+        <!-- BOTÓN GENERADOR DE ENLACE DE CLIENTE -->
+        <button type="button" onclick="copyClientLink()" class="px-3 py-1.5 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-lg shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-share-nodes"></i> Link Cliente
+        </button>
+
+        <button type="button" id="btnTogglePreview" onclick="togglePreviewMode()" class="px-3 py-1.5 text-xs font-bold text-slate-800 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-eye text-amber-700"></i> <span id="lblPreviewBtn">Vista Previa</span>
+        </button>
+        <button type="button" onclick="shareViaWhatsApp()" class="px-3 py-1.5 text-xs font-bold text-white bg-[#25D366] hover:bg-[#20ba5a] active:scale-95 rounded-lg shadow transition flex items-center gap-1.5">
+          <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+        </button>
+        <button type="button" onclick="downloadContractPNG()" class="px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 active:scale-95 rounded-lg shadow-xs transition flex items-center gap-1">
+          <i class="fa-solid fa-file-arrow-down text-brand-blue"></i> PNG
+        </button>
+        <button type="button" onclick="prepareAndPrint()" class="px-3 py-1.5 text-xs font-bold text-white bg-brand-blue hover:bg-brand-darkblue rounded-lg shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-print"></i> PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- PANEL DESPLEGABLE CON LOS CONTROLES DE TAMAÑO -->
+    <div id="zoneSizePanel" class="hidden no-print border-t border-indigo-100 bg-slate-50 py-3 px-4 shadow-inner">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between border-b border-indigo-200 pb-2 mb-2.5">
+          <span class="font-bold text-xs text-indigo-950 flex items-center gap-1.5">
+            <i class="fa-solid fa-sliders text-indigo-600"></i> Calibración de Tamaños y Espaciados por Zona
+          </span>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="resetZoneSizes()" class="text-[11px] font-bold text-slate-600 hover:text-rose-600 bg-white px-2 py-0.5 rounded border border-slate-300">
+              Restablecer Todo
+            </button>
+            <button type="button" onclick="toggleSizePanel()" class="text-slate-400 hover:text-slate-700 px-1 text-sm">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 text-xs">
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Separación:</span><span id="badge_gap" class="text-indigo-600">8px</span></div>
+            <input type="range" id="range_gap" min="2" max="18" step="1" value="8" oninput="updateZoneVar('gap', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Título:</span><span id="badge_headerTitle" class="text-indigo-600">19px</span></div>
+            <input type="range" id="range_headerTitle" min="14" max="26" step="1" value="19" oninput="updateZoneVar('headerTitle', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Cliente:</span><span id="badge_clientFont" class="text-indigo-600">11.5px</span></div>
+            <input type="range" id="range_clientFont" min="9" max="15" step="0.5" value="11.5" oninput="updateZoneVar('clientFont', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Partidas:</span><span id="badge_itemsFont" class="text-indigo-600">12px</span></div>
+            <input type="range" id="range_itemsFont" min="8.5" max="15" step="0.5" value="12" oninput="updateZoneVar('itemsFont', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Cláusulas:</span><span id="badge_conditionsFont" class="text-indigo-600">8.2px</span></div>
+            <input type="range" id="range_conditionsFont" min="6.5" max="11" step="0.2" value="8.2" oninput="updateZoneVar('conditionsFont', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Interlineado:</span><span id="badge_conditionsLine" class="text-indigo-600">1.22</span></div>
+            <input type="range" id="range_conditionsLine" min="1.05" max="1.45" step="0.03" value="1.22" oninput="updateZoneVar('conditionsLine', '')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Finanzas:</span><span id="badge_financialFont" class="text-indigo-600">11.5px</span></div>
+            <input type="range" id="range_financialFont" min="8.5" max="14" step="0.5" value="11.5" oninput="updateZoneVar('financialFont', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+          <div class="bg-white p-1.5 rounded border border-slate-200">
+            <div class="flex justify-between text-[10px] font-bold mb-1"><span>Caja Firma:</span><span id="badge_sigHeight" class="text-indigo-600">56px</span></div>
+            <input type="range" id="range_sigHeight" min="36" max="90" step="2" value="56" oninput="updateZoneVar('sigHeight', this.value, 'px')" class="w-full accent-indigo-600 cursor-pointer">
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-4xl mx-auto p-2 sm:p-4 lg:p-6 flex flex-col items-center w-full">
+    
+    <!-- BANNER EN MODO VISTA PREVIA -->
+    <div class="preview-actions-bar no-print w-full mb-3">
+      <div class="w-full bg-gradient-to-r from-emerald-50 via-teal-50 to-white border-2 border-emerald-400 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-md">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-brands fa-whatsapp text-2xl text-[#25D366]"></i>
+          <span id="lblPreviewBannerPaper" class="font-bold text-slate-800 text-xs sm:text-sm">Vista Previa — Hoja Tamaño Legal (8.5” x 14”)</span>
+        </div>
+        <div class="flex items-center flex-wrap gap-2">
+          <button type="button" onclick="shareViaWhatsApp()" class="px-3 py-1.5 text-xs font-bold text-white bg-[#25D366] rounded-lg shadow">Enviar WhatsApp</button>
+          <button type="button" onclick="downloadContractPNG()" class="px-3 py-1.5 text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg">Descargar PNG</button>
+          <button type="button" onclick="prepareAndPrint()" class="px-3 py-1.5 text-xs font-bold text-white bg-brand-blue rounded-lg">Guardar PDF</button>
+          <button type="button" onclick="togglePreviewMode()" class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-200 rounded-lg">Seguir Editando</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOJA DEL CONTRATO -->
+    <div id="contractSheet" class="contract-container paper-legal bg-white p-3 sm:p-5 lg:p-6 text-slate-800">
+      
+      <!-- 1. ENCABEZADO -->
+      <section id="sec_header" class="movable-section border-b-2 border-slate-800 pb-2" data-section-name="Encabezado">
+        <div class="section-move-bar preview-hide no-print flex flex-wrap items-center justify-between bg-slate-100 border border-slate-300 rounded px-2 py-1 mb-1.5 text-[10px] gap-1">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-indigo-900 cursor-grab section-drag-handle flex items-center gap-1"><i class="fa-solid fa-grip-vertical text-slate-400"></i> 1. Encabezado</span>
+            <button type="button" onclick="moveSection('sec_header', 'up')" class="zone-quick-btn">▲</button>
+            <button type="button" onclick="moveSection('sec_header', 'down')" class="zone-quick-btn">▼</button>
+            <button type="button" onclick="toggleCoupleSection('sec_header')" id="btn_couple_sec_header" class="zone-quick-btn !bg-blue-50 !text-blue-700 !border-blue-200"><i class="fa-solid fa-link text-[8px]"></i> Juntar</button>
+          </div>
+          <div class="flex items-center flex-wrap gap-1">
+            <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded px-1.5 py-0.5">
+              <span class="text-slate-500 font-bold text-[9px]">Altura:</span>
+              <input type="number" id="h_input_sec_header" min="30" max="950" step="5" class="w-11 text-center font-mono font-bold text-indigo-700 text-[10px] border-b border-slate-300 focus:outline-none" placeholder="Auto" oninput="setSectionHeight('sec_header', this.value)">
+              <span class="text-slate-400 text-[8.5px]">px</span>
+              <button type="button" onclick="adjustSectionHeight('sec_header', -10)" class="zone-quick-btn !px-1">-</button>
+              <button type="button" onclick="adjustSectionHeight('sec_header', 10)" class="zone-quick-btn !px-1">+</button>
+              <button type="button" onclick="resetSectionHeight('sec_header')" class="zone-quick-btn !px-1 !text-slate-400">Auto</button>
+            </div>
+            <label class="zone-quick-btn !bg-amber-50 !text-amber-800 !border-amber-300 hover:!bg-amber-100 cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-paperclip text-[9px]"></i> Adjuntar
+              <input type="file" accept="image/*" class="hidden" onchange="attachImageToSection('sec_header', this)">
+            </label>
+          </div>
+        </div>
+
+        <div class="header-row-print flex flex-col md:flex-row items-center justify-between gap-3 w-full">
+          <div class="flex items-center gap-2.5">
+            <svg width="70" height="52" viewBox="0 0 160 130" class="shrink-0 drop-shadow-sm">
+              <defs>
+                <linearGradient id="doorBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#039BE5" /><stop offset="100%" stop-color="#01579B" />
+                </linearGradient>
+                <linearGradient id="doorRedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#E53935" /><stop offset="100%" stop-color="#8E0000" />
+                </linearGradient>
+              </defs>
+              <path d="M 15 80 A 70 70 0 0 1 125 15" fill="none" stroke="#9E9E9E" stroke-width="7" stroke-linecap="round"/>
+              <polygon points="35,28 72,40 72,120 35,108" fill="url(#doorBlueGrad)" stroke="#014175" stroke-width="2"/>
+              <rect x="42" y="38" width="11" height="28" fill="#E1F5FE" opacity="0.9"/>
+              <rect x="56" y="42" width="11" height="28" fill="#E1F5FE" opacity="0.9"/>
+              <rect x="42" y="72" width="11" height="30" fill="#E1F5FE" opacity="0.9"/>
+              <rect x="56" y="75" width="11" height="30" fill="#E1F5FE" opacity="0.9"/>
+              <polygon points="72,40 98,28 98,108 72,120" fill="url(#doorRedGrad)" stroke="#570000" stroke-width="2"/>
+              <rect x="76" y="42" width="16" height="66" fill="#FFFFFF" opacity="0.95"/>
+              <circle cx="80" cy="74" r="3.5" fill="#B71C1C"/>
+              <text x="100" y="90" font-family="serif" font-size="58" font-weight="bold" fill="#0D47A1" font-style="italic">C</text>
+              <text x="132" y="105" font-family="serif" font-size="44" font-weight="bold" fill="#0D47A1" font-style="italic">v</text>
+            </svg>
+
+            <div>
+              <h2 id="editableHeaderTitle" class="title-print font-black text-brand-darkred uppercase font-display leading-none editable-area" contenteditable="true">
+                CV Puertas Ventanas &amp; Mas
+              </h2>
+              <div class="text-xs sm:text-sm font-bold text-brand-red flex items-center gap-1 mt-0.5">
+                <i class="fa-solid fa-phone text-[10px]"></i>
+                <span id="editableHeaderPhone" class="editable-area" contenteditable="true">Tel. (787) 242-8699</span>
+              </div>
+              <p id="editableHeaderAddr" class="text-[10px] sm:text-xs font-semibold text-slate-600 uppercase tracking-wider editable-area" contenteditable="true">
+                Las Piedras, Puerto Rico
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 border-2 border-slate-800 rounded-lg p-2 w-full md:w-auto shrink-0">
+            <div class="flex items-center justify-between gap-1.5 border-b border-slate-300 pb-1 mb-1">
+              <span class="text-[10px] sm:text-[11px] font-black text-slate-800 uppercase editable-area" contenteditable="true">CONTRATO #:</span>
+              <div class="flex items-center gap-1">
+                <input type="text" id="contractNumber" value="CV-104829" class="preview-hide no-print border border-slate-300 rounded px-1 py-0.5 text-xs font-mono font-bold text-brand-blue text-right w-24">
+                <span id="contractNumberPrint" class="print-only text-xs font-mono font-bold text-brand-blue text-right">CV-104829</span>
+                <button type="button" onclick="generateNewContractNumber()" class="preview-hide no-print p-0.5 text-slate-600 hover:text-brand-blue"><i class="fa-solid fa-arrows-rotate text-xs"></i></button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-1.5">
+              <span class="text-[10px] sm:text-[11px] font-black text-slate-800 uppercase editable-area" contenteditable="true">FECHA:</span>
+              <input type="date" id="contractDate" onchange="syncDates()" class="preview-hide no-print border border-slate-300 rounded px-1 py-0.5 text-xs font-bold text-slate-800 text-right w-28">
+              <span id="contractDatePrint" class="print-only text-xs font-bold text-slate-800 text-right"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="attachment_container_sec_header" class="attachment-area hidden my-1.5 p-1.5 border border-dashed border-amber-400 bg-amber-50/50 rounded-lg relative">
+          <div class="flex items-center justify-between mb-1 pb-1 border-b border-amber-200 text-[10px]">
+            <span id="attachment_label_sec_header" class="font-bold text-amber-900 editable-area" contenteditable="true">Archivo / Foto Adjunta - Encabezado</span>
+            <div class="preview-hide no-print flex items-center gap-1">
+              <button type="button" onclick="setAttachmentSize('sec_header', 'sm')" class="zone-quick-btn">Chico</button>
+              <button type="button" onclick="setAttachmentSize('sec_header', 'md')" class="zone-quick-btn">Medio</button>
+              <button type="button" onclick="setAttachmentSize('sec_header', 'lg')" class="zone-quick-btn">Grande</button>
+              <button type="button" onclick="setAttachmentSize('sec_header', 'full')" class="zone-quick-btn">Ancho</button>
+              <button type="button" onclick="removeAttachment('sec_header')" class="zone-quick-btn !bg-rose-50 !text-rose-700">Quitar</button>
+            </div>
+          </div>
+          <div class="flex justify-center items-center overflow-hidden rounded bg-white/70">
+            <img id="attachment_img_sec_header" class="object-contain max-h-40 rounded" alt="Adjunto Encabezado">
+          </div>
+        </div>
+        <div class="section-resize-handle preview-hide no-print flex items-center justify-center py-0.5 cursor-row-resize" onmousedown="startResizingSection('sec_header', event)" ontouchstart="startResizingSection('sec_header', event)">
+          <div class="w-14 h-1 bg-slate-300 rounded-full hover:bg-indigo-500"></div>
+        </div>
+      </section>
+
+      <!-- 2. DATOS DEL CLIENTE -->
+      <section id="sec_client" class="movable-section border border-slate-800 rounded-lg bg-slate-50/70 p-2.5" data-section-name="Cliente">
+        <div class="section-move-bar preview-hide no-print flex flex-wrap items-center justify-between bg-slate-100 border border-slate-300 rounded px-2 py-1 mb-1.5 text-[10px] gap-1">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-indigo-900 cursor-grab section-drag-handle flex items-center gap-1"><i class="fa-solid fa-grip-vertical text-slate-400"></i> 2. Cliente</span>
+            <button type="button" onclick="moveSection('sec_client', 'up')" class="zone-quick-btn">▲</button>
+            <button type="button" onclick="moveSection('sec_client', 'down')" class="zone-quick-btn">▼</button>
+            <button type="button" onclick="toggleCoupleSection('sec_client')" id="btn_couple_sec_client" class="zone-quick-btn !bg-blue-50 !text-blue-700 !border-blue-200"><i class="fa-solid fa-link text-[8px]"></i> Juntar</button>
+          </div>
+          <div class="flex items-center flex-wrap gap-1">
+            <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded px-1.5 py-0.5">
+              <span class="text-slate-500 font-bold text-[9px]">Altura:</span>
+              <input type="number" id="h_input_sec_client" min="30" max="950" step="5" class="w-11 text-center font-mono font-bold text-indigo-700 text-[10px] border-b border-slate-300 focus:outline-none" placeholder="Auto" oninput="setSectionHeight('sec_client', this.value)">
+              <span class="text-slate-400 text-[8.5px]">px</span>
+              <button type="button" onclick="adjustSectionHeight('sec_client', -10)" class="zone-quick-btn !px-1">-</button>
+              <button type="button" onclick="adjustSectionHeight('sec_client', 10)" class="zone-quick-btn !px-1">+</button>
+              <button type="button" onclick="resetSectionHeight('sec_client')" class="zone-quick-btn !px-1 !text-slate-400">Auto</button>
+            </div>
+            <label class="zone-quick-btn !bg-amber-50 !text-amber-800 !border-amber-300 hover:!bg-amber-100 cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-paperclip text-[9px]"></i> Adjuntar
+              <input type="file" accept="image/*" class="hidden" onchange="attachImageToSection('sec_client', this)">
+            </label>
+          </div>
+        </div>
+
+        <div class="client-grid-print grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div>
+            <label class="block font-bold text-slate-600 text-[10px] editable-area" contenteditable="true">Nombre:</label>
+            <input type="text" id="clientName" value="JUAN NIEVEZ CASSAS" class="preview-hide no-print w-full bg-white border border-slate-300 rounded px-2 py-1 font-bold text-slate-900 text-xs">
+            <div id="clientNamePrint" class="print-only font-bold text-slate-900 text-xs py-0.5">JUAN NIEVEZ CASSAS</div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 text-[10px] editable-area" contenteditable="true">Teléfono:</label>
+            <input type="text" id="clientPhone" value="787-605-3908" class="preview-hide no-print w-full bg-white border border-slate-300 rounded px-2 py-1 font-bold text-slate-900 text-xs">
+            <div id="clientPhonePrint" class="print-only font-bold text-slate-900 text-xs py-0.5">787-605-3908</div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 text-[10px] editable-area" contenteditable="true">Email:</label>
+            <input type="email" id="clientEmail" value="nievescassaslow@gmail.com" class="preview-hide no-print w-full bg-white border border-slate-300 rounded px-2 py-1 font-semibold text-slate-900 text-xs">
+            <div id="clientEmailPrint" class="print-only font-semibold text-slate-900 text-xs py-0.5">nievescassaslow@gmail.com</div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 text-[10px] editable-area" contenteditable="true">Dirección / Pueblo:</label>
+            <input type="text" id="clientAddress" value="SAN JUAN" class="preview-hide no-print w-full bg-white border border-slate-300 rounded px-2 py-1 font-bold text-slate-900 text-xs">
+            <div id="clientAddressPrint" class="print-only font-bold text-slate-900 text-xs py-0.5">SAN JUAN</div>
+          </div>
+        </div>
+
+        <div id="attachment_container_sec_client" class="attachment-area hidden my-1.5 p-1.5 border border-dashed border-amber-400 bg-amber-50/50 rounded-lg relative">
+          <div class="flex items-center justify-between mb-1 pb-1 border-b border-amber-200 text-[10px]">
+            <span id="attachment_label_sec_client" class="font-bold text-amber-900 editable-area" contenteditable="true">Archivo / Foto Adjunta - Cliente</span>
+            <div class="preview-hide no-print flex items-center gap-1">
+              <button type="button" onclick="setAttachmentSize('sec_client', 'sm')" class="zone-quick-btn">Chico</button>
+              <button type="button" onclick="setAttachmentSize('sec_client', 'md')" class="zone-quick-btn">Medio</button>
+              <button type="button" onclick="setAttachmentSize('sec_client', 'lg')" class="zone-quick-btn">Grande</button>
+              <button type="button" onclick="setAttachmentSize('sec_client', 'full')" class="zone-quick-btn">Ancho</button>
+              <button type="button" onclick="removeAttachment('sec_client')" class="zone-quick-btn !bg-rose-50 !text-rose-700">Quitar</button>
+            </div>
+          </div>
+          <div class="flex justify-center items-center overflow-hidden rounded bg-white/70">
+            <img id="attachment_img_sec_client" class="object-contain max-h-40 rounded" alt="Adjunto Cliente">
+          </div>
+        </div>
+        <div class="section-resize-handle preview-hide no-print flex items-center justify-center py-0.5 cursor-row-resize" onmousedown="startResizingSection('sec_client', event)" ontouchstart="startResizingSection('sec_client', event)">
+          <div class="w-14 h-1 bg-slate-300 rounded-full hover:bg-indigo-500"></div>
+        </div>
+      </section>
+
+      <!-- 3. PARTIDAS Y DETALLE -->
+      <section id="sec_items" class="movable-section border-2 border-slate-800 rounded-lg overflow-hidden shadow-sm" data-section-name="Partidas">
+        <div class="section-move-bar preview-hide no-print flex flex-wrap items-center justify-between bg-slate-100 border-b border-slate-300 px-2 py-1 text-[10px] gap-1">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-indigo-900 cursor-grab section-drag-handle flex items-center gap-1"><i class="fa-solid fa-grip-vertical text-slate-400"></i> 3. Partidas</span>
+            <button type="button" onclick="moveSection('sec_items', 'up')" class="zone-quick-btn">▲</button>
+            <button type="button" onclick="moveSection('sec_items', 'down')" class="zone-quick-btn">▼</button>
+            <button type="button" onclick="toggleCoupleSection('sec_items')" id="btn_couple_sec_items" class="zone-quick-btn !bg-blue-50 !text-blue-700 !border-blue-200"><i class="fa-solid fa-link text-[8px]"></i> Juntar</button>
+          </div>
+          <div class="flex items-center flex-wrap gap-1">
+            <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded px-1.5 py-0.5">
+              <span class="text-slate-500 font-bold text-[9px]">Altura:</span>
+              <input type="number" id="h_input_sec_items" min="30" max="950" step="5" class="w-11 text-center font-mono font-bold text-indigo-700 text-[10px] border-b border-slate-300 focus:outline-none" placeholder="Auto" oninput="setSectionHeight('sec_items', this.value)">
+              <span class="text-slate-400 text-[8.5px]">px</span>
+              <button type="button" onclick="adjustSectionHeight('sec_items', -10)" class="zone-quick-btn !px-1">-</button>
+              <button type="button" onclick="adjustSectionHeight('sec_items', 10)" class="zone-quick-btn !px-1">+</button>
+              <button type="button" onclick="resetSectionHeight('sec_items')" class="zone-quick-btn !px-1 !text-slate-400">Auto</button>
+            </div>
+            <label class="zone-quick-btn !bg-amber-50 !text-amber-800 !border-amber-300 hover:!bg-amber-100 cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-paperclip text-[9px]"></i> Adjuntar
+              <input type="file" accept="image/*" class="hidden" onchange="attachImageToSection('sec_items', this)">
+            </label>
+            <button type="button" onclick="addItemRow()" class="zone-quick-btn !bg-emerald-50 !text-emerald-700 !border-emerald-300"><i class="fa-solid fa-plus"></i> Partida</button>
+          </div>
+        </div>
+
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-200 border-b-2 border-slate-400 font-black text-slate-800 text-[11px] uppercase">
+              <th class="p-2 w-14 text-center border-r border-slate-300 editable-area" contenteditable="true">Cant.</th>
+              <th class="p-2 border-r border-slate-300 editable-area" contenteditable="true">Descripción Detallada</th>
+              <th class="p-2 w-36 text-right border-r border-slate-300 editable-area" contenteditable="true">Costo / Importe</th>
+              <th class="p-2 w-10 text-center preview-hide no-print">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody" class="divide-y divide-slate-200 bg-white text-xs"></tbody>
+        </table>
+
+        <div id="attachment_container_sec_items" class="attachment-area hidden my-1.5 p-1.5 border border-dashed border-amber-400 bg-amber-50/50 rounded-lg relative">
+          <div class="flex items-center justify-between mb-1 pb-1 border-b border-amber-200 text-[10px]">
+            <span id="attachment_label_sec_items" class="font-bold text-amber-900 editable-area" contenteditable="true">Archivo / Foto Adjunta - Partidas</span>
+            <div class="preview-hide no-print flex items-center gap-1">
+              <button type="button" onclick="setAttachmentSize('sec_items', 'sm')" class="zone-quick-btn">Chico</button>
+              <button type="button" onclick="setAttachmentSize('sec_items', 'md')" class="zone-quick-btn">Medio</button>
+              <button type="button" onclick="setAttachmentSize('sec_items', 'lg')" class="zone-quick-btn">Grande</button>
+              <button type="button" onclick="setAttachmentSize('sec_items', 'full')" class="zone-quick-btn">Ancho</button>
+              <button type="button" onclick="removeAttachment('sec_items')" class="zone-quick-btn !bg-rose-50 !text-rose-700">Quitar</button>
+            </div>
+          </div>
+          <div class="flex justify-center items-center overflow-hidden rounded bg-white/70">
+            <img id="attachment_img_sec_items" class="object-contain max-h-40 rounded" alt="Adjunto Partidas">
+          </div>
+        </div>
+        <div class="section-resize-handle preview-hide no-print flex items-center justify-center py-0.5 cursor-row-resize" onmousedown="startResizingSection('sec_items', event)" ontouchstart="startResizingSection('sec_items', event)">
+          <div class="w-14 h-1 bg-slate-300 rounded-full hover:bg-indigo-500"></div>
+        </div>
+      </section>
+
+      <!-- 4. DESGLOSE FINANCIERO Y 15 CONDICIONES -->
+      <section id="sec_fin_cond" class="movable-section" data-section-name="Finanzas y Cláusulas">
+        <div class="section-move-bar preview-hide no-print flex flex-wrap items-center justify-between bg-slate-100 border border-slate-300 rounded px-2 py-1 mb-1.5 text-[10px] gap-1">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-indigo-900 cursor-grab section-drag-handle flex items-center gap-1"><i class="fa-solid fa-grip-vertical text-slate-400"></i> 4. Finanzas y Cláusulas</span>
+            <button type="button" onclick="moveSection('sec_fin_cond', 'up')" class="zone-quick-btn">▲</button>
+            <button type="button" onclick="moveSection('sec_fin_cond', 'down')" class="zone-quick-btn">▼</button>
+            <button type="button" onclick="toggleCoupleSection('sec_fin_cond')" id="btn_couple_sec_fin_cond" class="zone-quick-btn !bg-blue-50 !text-blue-700 !border-blue-200"><i class="fa-solid fa-link text-[8px]"></i> Juntar</button>
+          </div>
+          <div class="flex items-center flex-wrap gap-1">
+            <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded px-1.5 py-0.5">
+              <span class="text-slate-500 font-bold text-[9px]">Altura:</span>
+              <input type="number" id="h_input_sec_fin_cond" min="30" max="950" step="5" class="w-11 text-center font-mono font-bold text-indigo-700 text-[10px] border-b border-slate-300 focus:outline-none" placeholder="Auto" oninput="setSectionHeight('sec_fin_cond', this.value)">
+              <span class="text-slate-400 text-[8.5px]">px</span>
+              <button type="button" onclick="adjustSectionHeight('sec_fin_cond', -10)" class="zone-quick-btn !px-1">-</button>
+              <button type="button" onclick="adjustSectionHeight('sec_fin_cond', 10)" class="zone-quick-btn !px-1">+</button>
+              <button type="button" onclick="resetSectionHeight('sec_fin_cond')" class="zone-quick-btn !px-1 !text-slate-400">Auto</button>
+            </div>
+            <label class="zone-quick-btn !bg-amber-50 !text-amber-800 !border-amber-300 hover:!bg-amber-100 cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-paperclip text-[9px]"></i> Adjuntar
+              <input type="file" accept="image/*" class="hidden" onchange="attachImageToSection('sec_fin_cond', this)">
+            </label>
+            <button type="button" onclick="swapFinCondColumns()" class="zone-quick-btn !bg-indigo-50 !text-indigo-700 border-indigo-200"><i class="fa-solid fa-right-left"></i> Lado</button>
+            <button type="button" onclick="cycleFinCondRatio()" class="zone-quick-btn" title="Alternar proporción"><i class="fa-solid fa-table-columns"></i> <span id="lbl_ratio_badge">5:7</span></button>
+          </div>
+        </div>
+
+        <div id="finCondGrid" class="fin-cond-grid-print grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+          <!-- Columna Finanzas -->
+          <div id="col_financial" class="md:col-span-5 border-2 border-slate-800 rounded-lg p-2.5 bg-slate-50/90 shadow-sm text-xs space-y-1">
+            <h3 class="font-black uppercase text-slate-800 tracking-wider flex items-center gap-1 text-[11px] border-b pb-1 editable-area" contenteditable="true">
+              <i class="fa-solid fa-calculator text-brand-blue"></i> Desglose Financiero
+            </h3>
+            <div class="flex justify-between items-center py-0.5">
+              <span class="font-bold text-slate-700 uppercase editable-area" contenteditable="true">Subtotal:</span>
+              <span class="font-black text-slate-900 font-mono" id="lblSubtotal">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center py-0.5 border-t border-slate-200">
+              <span class="font-bold text-slate-700 editable-area" contenteditable="true">IVU (11.5%):</span>
+              <span class="font-black text-slate-900 font-mono" id="lblIvu">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center py-0.5 border-t border-slate-200">
+              <label class="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
+                <input type="checkbox" id="chkCard" onchange="toggleFee('card')" class="w-3 h-3 text-brand-blue">
+                <span class="editable-area" contenteditable="true">Tarjeta (4.3%)</span>
+              </label>
+              <span class="font-bold text-slate-700 font-mono" id="lblCardFee">N/A</span>
+            </div>
+            <div class="flex justify-between items-center py-0.5 border-t border-slate-200">
+              <label class="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
+                <input type="checkbox" id="chkKlarna" onchange="toggleFee('klarna')" class="w-3 h-3 text-brand-blue">
+                <span class="editable-area" contenteditable="true">Klarna (8.99%)</span>
+              </label>
+              <span class="font-bold text-slate-700 font-mono" id="lblKlarnaFee">N/A</span>
+            </div>
+            <div class="flex justify-between items-center py-1 px-2 bg-brand-darkblue text-white rounded shadow-sm">
+              <span class="font-black tracking-wide text-[11px] editable-area" contenteditable="true">TOTAL A PAGAR:</span>
+              <span class="font-black text-sm font-mono" id="lblTotal">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center py-0.5">
+              <span class="font-extrabold text-brand-red editable-area" contenteditable="true">Depósito Mínimo (50%):</span>
+              <span class="font-black text-brand-red font-mono" id="lblMinDeposit">$0.00</span>
+            </div>
+            <div class="p-1.5 bg-amber-50/80 border border-amber-300 rounded space-y-1">
+              <div class="flex justify-between items-center">
+                <span class="font-extrabold text-amber-950 text-[10px] editable-area" contenteditable="true">Depósito Recibido:</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="applyFiftyPercent()" class="preview-hide no-print text-[9px] bg-brand-blue text-white font-extrabold px-1 rounded">50%</button>
+                  <input type="number" id="inputDepositPaid" value="0.00" step="0.01" class="preview-hide no-print w-20 text-right font-black text-emerald-800 border rounded px-1 text-xs" oninput="calculateTotals()">
+                  <span id="depositPaidPrint" class="print-only font-mono font-black text-emerald-800 text-xs">$0.00</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] pt-0.5 border-t border-amber-200">
+                <span class="text-slate-600 font-bold editable-area" contenteditable="true">Método:</span>
+                <select id="paymentMethod" onchange="syncPaymentMethod()" class="preview-hide no-print border rounded px-1 text-[10px] font-bold">
+                  <option value="ATH Móvil" selected>ATH Móvil</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Tarjeta">Tarjeta Crédito / Débito</option>
+                  <option value="Klarna">Klarna</option>
+                  <option value="Transferencia">Transferencia</option>
+                </select>
+                <span id="paymentMethodPrint" class="print-only font-bold text-slate-800 text-[10px]">ATH Móvil</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center py-1 px-2 bg-slate-200 rounded border mt-1">
+              <span class="font-black text-slate-900 text-[10px] editable-area" contenteditable="true">BALANCE PENDIENTE:</span>
+              <span class="font-black text-slate-900 font-mono text-sm" id="lblBalance">$0.00</span>
+            </div>
+
+            <!-- ENLACE DE PAGO DIGITAL -->
+            <div id="paymentLinkContainer" class="p-1.5 bg-blue-50/80 border border-blue-200 rounded space-y-1 mt-1">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold text-brand-darkblue text-[10px] flex items-center gap-1 editable-area" contenteditable="true">
+                  <i class="fa-solid fa-link text-brand-blue"></i> Enlace de Pago Digital:
+                </span>
+                <div class="preview-hide no-print flex items-center gap-1">
+                  <button type="button" onclick="setPaymentPreset('ath')" class="text-[8.5px] font-bold bg-white text-slate-700 px-1 py-0.5 rounded border border-slate-300 hover:bg-slate-100">ATH</button>
+                  <button type="button" onclick="setPaymentPreset('custom')" class="text-[8.5px] font-bold bg-white text-slate-700 px-1 py-0.5 rounded border border-slate-300 hover:bg-slate-100">Limpiar</button>
+                </div>
+              </div>
+              
+              <div class="preview-hide no-print flex items-center gap-1">
+                <input type="url" id="inputPaymentUrl" value="" placeholder="https://enlace-de-pago.com" class="w-full text-[10px] bg-white border border-slate-300 rounded px-1.5 py-0.5 font-mono text-slate-800" oninput="syncPaymentLink()">
+                <button type="button" onclick="testPaymentLink()" class="zone-quick-btn !bg-blue-600 !text-white !border-blue-700 shrink-0" title="Abrir enlace">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                </button>
+              </div>
+
+              <div class="no-print pt-0.5" id="btnPayOnlineWrapper">
+                <a id="btnPayOnline" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-1 px-2 bg-brand-blue hover:bg-brand-darkblue text-white text-[10.5px] font-black rounded text-center flex items-center justify-center gap-1.5 shadow-xs transition opacity-40 pointer-events-none">
+                  <i class="fa-solid fa-circle-dollar-to-slot"></i> <span id="lblPayOnlineText">Pagar / Abonar en Línea</span>
+                </a>
+              </div>
+
+              <div class="print-only text-[8px] text-slate-700 pt-0.5">
+                <span class="font-bold text-slate-900">Enlace de Pago:</span> <span id="paymentUrlPrint" class="font-mono text-brand-blue underline">---</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Cláusulas -->
+          <div id="col_conditions" class="md:col-span-7 border border-slate-800 rounded-lg p-2.5 bg-white flex flex-col justify-between">
+            <div class="border-b pb-1 mb-1.5 flex items-center justify-between">
+              <h3 class="text-[11px] font-black uppercase text-brand-darkred tracking-wider editable-area" contenteditable="true">
+                <i class="fa-solid fa-scale-balanced mr-1"></i> Condiciones del Contrato (15 Cláusulas Oficiales)
+              </h3>
+              <div class="preview-hide no-print flex items-center gap-1">
+                <button type="button" onclick="addClause()" class="zone-quick-btn !bg-emerald-50 !text-emerald-700">+ Cláusula</button>
+                <button type="button" onclick="removeLastClause()" class="zone-quick-btn !bg-rose-50 !text-rose-700">🗑️</button>
+              </div>
+            </div>
+            <div class="conditions-scroll-box overflow-y-auto max-h-[260px] custom-scroll pr-1">
+              <ol id="conditionsList" class="conditions-list-print list-decimal list-outside pl-3 space-y-0.5 font-medium text-slate-700">
+                <li class="editable-area" contenteditable="true"><strong>Depósito Inicial y Fabricación:</strong> Depósito mínimo del 50% para procesar la orden y comenzar manufactura.</li>
+                <li class="editable-area" contenteditable="true"><strong>Cancelación:</strong> Antes de compras o fabricación, 35% del depósito no es reembolsable. Una vez iniciada, no hay devolución bajo ninguna circunstancia.</li>
+                <li class="editable-area" contenteditable="true"><strong>Responsabilidad por Medidas:</strong> La empresa no responde por medidas brindadas por el cliente; errores o cambios correrán por su cuenta.</li>
+                <li class="editable-area" contenteditable="true"><strong>Tiempos de Entrega:</strong> Los tiempos son estimados y pueden afectarse por clima o disponibilidad de materiales.</li>
+                <li class="editable-area" contenteditable="true"><strong>Acceso y Reprogramación:</strong> Cancelaciones o reprogramaciones con menos de 48 horas conllevan recargo de <strong>$275.00</strong>.</li>
+                <li class="editable-area" contenteditable="true"><strong>Remoción y Labores Ajenas:</strong> No incluye remoción de puertas/ventanas viejas ni labores de albañilería, plomería o electricidad.</li>
+                <li class="editable-area" contenteditable="true"><strong>Estructura:</strong> No respondemos por vicios estructurales, descuadres o empañetados frágiles en la propiedad.</li>
+                <li class="editable-area" contenteditable="true"><strong>Sellado:</strong> Se incluye un (1) caulking por unidad instalada; material adicional conllevará costo extra.</li>
+                <li class="editable-area" contenteditable="true"><strong>Exclusiones de Garantía:</strong> Cristales, aluminio, goznes y cerraduras no poseen garantía. Excluidos eventos atmosféricos.</li>
+                <li class="editable-area" contenteditable="true"><strong>Materiales:</strong> Ligeras variaciones de tono en aluminio o cristal son inherentes y no constituyen defecto.</li>
+                <li class="editable-area" contenteditable="true"><strong>Métodos de Pago:</strong> Aceptamos ATH Móvil, efectivo, tarjeta y Klarna. <strong>No se aceptan cheques.</strong></li>
+                <li class="editable-area" contenteditable="true"><strong>Uso:</strong> Aplica estrictamente a uso residencial.</li>
+                <li class="editable-area" contenteditable="true"><strong>Pisos Superiores / Apartamentos:</strong> Entregas e instalaciones en niveles elevados tienen recargo logístico.</li>
+                <li class="editable-area" contenteditable="true"><strong>Permisos:</strong> La obtención de permisos comunitarios o estatales es responsabilidad del cliente.</li>
+                <li class="editable-area" contenteditable="true"><strong>Liquidación Total Obligatoria:</strong> <strong>El balance restante debe estar 100% saldado antes o al momento de la entrega.</strong></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div id="attachment_container_sec_fin_cond" class="attachment-area hidden my-1.5 p-1.5 border border-dashed border-amber-400 bg-amber-50/50 rounded-lg relative">
+          <div class="flex items-center justify-between mb-1 pb-1 border-b border-amber-200 text-[10px]">
+            <span id="attachment_label_sec_fin_cond" class="font-bold text-amber-900 editable-area" contenteditable="true">Archivo / Foto Adjunta - Finanzas y Cláusulas</span>
+            <div class="preview-hide no-print flex items-center gap-1">
+              <button type="button" onclick="setAttachmentSize('sec_fin_cond', 'sm')" class="zone-quick-btn">Chico</button>
+              <button type="button" onclick="setAttachmentSize('sec_fin_cond', 'md')" class="zone-quick-btn">Medio</button>
+              <button type="button" onclick="setAttachmentSize('sec_fin_cond', 'lg')" class="zone-quick-btn">Grande</button>
+              <button type="button" onclick="setAttachmentSize('sec_fin_cond', 'full')" class="zone-quick-btn">Ancho</button>
+              <button type="button" onclick="removeAttachment('sec_fin_cond')" class="zone-quick-btn !bg-rose-50 !text-rose-700">Quitar</button>
+            </div>
+          </div>
+          <div class="flex justify-center items-center overflow-hidden rounded bg-white/70">
+            <img id="attachment_img_sec_fin_cond" class="object-contain max-h-40 rounded" alt="Adjunto Finanzas y Cláusulas">
+          </div>
+        </div>
+        <div class="section-resize-handle preview-hide no-print flex items-center justify-center py-0.5 cursor-row-resize" onmousedown="startResizingSection('sec_fin_cond', event)" ontouchstart="startResizingSection('sec_fin_cond', event)">
+          <div class="w-14 h-1 bg-slate-300 rounded-full hover:bg-indigo-500"></div>
+        </div>
+      </section>
+
+      <!-- 5. FIRMAS DIGITALES -->
+      <section id="sec_signatures" class="movable-section border-2 border-slate-800 rounded-lg p-2 bg-slate-50/60" data-section-name="Firmas">
+        <div class="section-move-bar preview-hide no-print flex flex-wrap items-center justify-between bg-slate-100 border border-slate-300 rounded px-2 py-1 mb-1.5 text-[10px] gap-1">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-indigo-900 cursor-grab section-drag-handle flex items-center gap-1"><i class="fa-solid fa-grip-vertical text-slate-400"></i> 5. Firmas</span>
+            <button type="button" onclick="moveSection('sec_signatures', 'up')" class="zone-quick-btn">▲</button>
+            <button type="button" onclick="moveSection('sec_signatures', 'down')" class="zone-quick-btn">▼</button>
+            <button type="button" onclick="toggleCoupleSection('sec_signatures')" id="btn_couple_sec_signatures" class="zone-quick-btn !bg-blue-50 !text-blue-700 !border-blue-200"><i class="fa-solid fa-link text-[8px]"></i> Juntar</button>
+          </div>
+          <div class="flex items-center flex-wrap gap-1">
+            <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded px-1.5 py-0.5">
+              <span class="text-slate-500 font-bold text-[9px]">Altura:</span>
+              <input type="number" id="h_input_sec_signatures" min="30" max="950" step="5" class="w-11 text-center font-mono font-bold text-indigo-700 text-[10px] border-b border-slate-300 focus:outline-none" placeholder="Auto" oninput="setSectionHeight('sec_signatures', this.value)">
+              <span class="text-slate-400 text-[8.5px]">px</span>
+              <button type="button" onclick="adjustSectionHeight('sec_signatures', -10)" class="zone-quick-btn !px-1">-</button>
+              <button type="button" onclick="adjustSectionHeight('sec_signatures', 10)" class="zone-quick-btn !px-1">+</button>
+              <button type="button" onclick="resetSectionHeight('sec_signatures')" class="zone-quick-btn !px-1 !text-slate-400">Auto</button>
+            </div>
+            <label class="zone-quick-btn !bg-amber-50 !text-amber-800 !border-amber-300 hover:!bg-amber-100 cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-paperclip text-[9px]"></i> Adjuntar
+              <input type="file" accept="image/*" class="hidden" onchange="attachImageToSection('sec_signatures', this)">
+            </label>
+            <button type="button" onclick="swapSignatures()" class="zone-quick-btn !bg-indigo-50 !text-indigo-700 border-indigo-200"><i class="fa-solid fa-right-left"></i> Lado</button>
+          </div>
+        </div>
+
+        <div id="signaturesGrid" class="signatures-row-print grid grid-cols-1 md:grid-cols-2 gap-2">
+          <!-- Firma Cliente -->
+          <div id="col_sig_client" class="bg-white p-2 rounded-lg border border-slate-300 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[10px] font-black text-slate-900 uppercase editable-area" contenteditable="true">Firma del Cliente (Aceptación de Contrato)</span>
+                <button type="button" onclick="clearCanvas('signatureClient')" class="text-[9.5px] text-rose-600 font-extrabold hover:underline">Borrar Firma</button>
+              </div>
+              <p class="text-[8.5px] text-slate-600 mb-1 leading-none editable-area" contenteditable="true">
+                Certifico haber leído y aceptado íntegramente las condiciones vinculantes de este contrato.
+              </p>
+              <div class="sig-canvas-container border border-dashed border-slate-300 rounded bg-white relative touch-none overflow-hidden flex items-center justify-center">
+                <canvas id="signatureClient" class="w-full h-full block cursor-crosshair"></canvas>
+                <img id="img_signatureClient" class="print-only max-h-full max-w-full object-contain" alt="Firma del Cliente">
+              </div>
+            </div>
+            <div class="mt-1 text-[9.5px] border-t pt-0.5 flex justify-between items-center text-slate-600">
+              <span>Cliente: <strong id="sigClientNamePreview" class="text-slate-900">JUAN NIEVEZ CASSAS</strong></span>
+              <span class="text-[8.5px] text-brand-blue font-bold">(Firme con su dedo o ratón)</span>
+            </div>
+          </div>
+
+          <!-- Firma Recibo Conforme -->
+          <div id="col_sig_delivery" class="bg-white p-2 rounded-lg border border-amber-300 bg-amber-50/20 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[10px] font-black text-amber-950 uppercase flex items-center gap-1 editable-area" contenteditable="true">
+                  <i class="fa-solid fa-circle-check text-emerald-600"></i> Certificación de Entrega y Recibo Conforme
+                </span>
+                <button type="button" onclick="clearCanvas('signatureDelivery')" class="preview-hide no-print text-[9px] text-rose-600 font-bold underline">Borrar</button>
+              </div>
+              <p class="text-[8.5px] text-slate-700 mb-1 leading-none italic font-medium editable-area" contenteditable="true">
+                "Certifico haber recibido la mercancía y trabajo conforme a lo acordado."
+              </p>
+              <div class="sig-canvas-container border border-dashed border-amber-300 rounded bg-white relative touch-none overflow-hidden flex items-center justify-center">
+                <canvas id="signatureDelivery" class="w-full h-full block cursor-crosshair"></canvas>
+                <img id="img_signatureDelivery" class="print-only max-h-full max-w-full object-contain" alt="Recibo Conforme">
+              </div>
+            </div>
+            <div class="mt-1 text-[9.5px] border-t border-amber-200 pt-0.5 grid grid-cols-2 gap-1 text-slate-700">
+              <div class="flex items-center gap-1">
+                <span class="text-[9px] font-bold editable-area" contenteditable="true">Fecha:</span>
+                <input type="date" id="deliveryDate" onchange="syncDates()" class="preview-hide no-print border rounded px-1 py-0.5 text-[9px] w-full">
+                <span id="deliveryDatePrint" class="print-only text-[9px] font-semibold"></span>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] font-bold text-slate-600 editable-area" contenteditable="true">Balance:</span>
+                <span class="font-mono font-black text-slate-900 text-xs" id="lblFinalBalancePaid">$0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="attachment_container_sec_signatures" class="attachment-area hidden my-1.5 p-1.5 border border-dashed border-amber-400 bg-amber-50/50 rounded-lg relative">
+          <div class="flex items-center justify-between mb-1 pb-1 border-b border-amber-200 text-[10px]">
+            <span id="attachment_label_sec_signatures" class="font-bold text-amber-900 editable-area" contenteditable="true">Archivo / Foto Adjunta - Firmas</span>
+            <div class="preview-hide no-print flex items-center gap-1">
+              <button type="button" onclick="setAttachmentSize('sec_signatures', 'sm')" class="zone-quick-btn">Chico</button>
+              <button type="button" onclick="setAttachmentSize('sec_signatures', 'md')" class="zone-quick-btn">Medio</button>
+              <button type="button" onclick="setAttachmentSize('sec_signatures', 'lg')" class="zone-quick-btn">Grande</button>
+              <button type="button" onclick="setAttachmentSize('sec_signatures', 'full')" class="zone-quick-btn">Ancho</button>
+              <button type="button" onclick="removeAttachment('sec_signatures')" class="zone-quick-btn !bg-rose-50 !text-rose-700">Quitar</button>
+            </div>
+          </div>
+          <div class="flex justify-center items-center overflow-hidden rounded bg-white/70">
+            <img id="attachment_img_sec_signatures" class="object-contain max-h-40 rounded" alt="Adjunto Firmas">
+          </div>
+        </div>
+        <div class="section-resize-handle preview-hide no-print flex items-center justify-center py-0.5 cursor-row-resize" onmousedown="startResizingSection('sec_signatures', event)" ontouchstart="startResizingSection('sec_signatures', event)">
+          <div class="w-14 h-1 bg-slate-300 rounded-full hover:bg-indigo-500"></div>
+        </div>
+      </section>
+
+      <!-- 6. PIE DE PÁGINA -->
+      <footer id="sec_footer" class="movable-section pt-1 border-t border-slate-300 text-center text-slate-500" data-section-name="Pie de Página">
+        <div class="section-move-bar preview-hide no-print flex flex-wrap items-center justify-between bg-slate-100 border border-slate-300 rounded px-2 py-1 mb-1 text-[10px] gap-1">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-indigo-900 cursor-grab section-drag-handle flex items-center gap-1"><i class="fa-solid fa-grip-vertical text-slate-400"></i> 6. Pie de Página</span>
+            <button type="button" onclick="moveSection('sec_footer', 'up')" class="zone-quick-btn">▲</button>
+            <button type="button" onclick="moveSection('sec_footer', 'down')" class="zone-quick-btn">▼</button>
+          </div>
+          <div class="flex items-center gap-1">
+            <label class="zone-quick-btn !bg-amber-50 !text-amber-800 !border-amber-300 hover:!bg-amber-100 cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-paperclip text-[9px]"></i> Adjuntar
+              <input type="file" accept="image/*" class="hidden" onchange="attachImageToSection('sec_footer', this)">
+            </label>
+          </div>
+        </div>
+        <p id="editableFooterText" class="font-bold text-slate-800 editable-area" contenteditable="true">
+          CV Puertas Ventanas &amp; Mas &bull; Las Piedras, Puerto Rico &bull; Tel: (787) 242-8699
+        </p>
+        <div id="attachment_container_sec_footer" class="attachment-area hidden my-1.5 p-1.5 border border-dashed border-amber-400 bg-amber-50/50 rounded-lg relative">
+          <div class="flex items-center justify-between mb-1 pb-1 border-b border-amber-200 text-[10px]">
+            <span id="attachment_label_sec_footer" class="font-bold text-amber-900 editable-area" contenteditable="true">Archivo / Foto Adjunta - Pie de Página</span>
+            <div class="preview-hide no-print flex items-center gap-1">
+              <button type="button" onclick="removeAttachment('sec_footer')" class="zone-quick-btn !bg-rose-50 !text-rose-700">Quitar</button>
+            </div>
+          </div>
+          <div class="flex justify-center items-center overflow-hidden rounded bg-white/70">
+            <img id="attachment_img_sec_footer" class="object-contain max-h-32 rounded" alt="Adjunto Pie">
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- BARRA FLOTANTE FIJA PARA EL CLIENTE (SOLO EN MODO CLIENTE) -->
+  <div id="clientBottomBar" class="hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t-2 border-emerald-500 shadow-2xl p-3">
+    <div class="max-w-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+      <div class="text-left w-full sm:w-auto">
+        <span class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-file-signature text-brand-blue"></i> Aceptación de Contrato
+        </span>
+        <p class="text-[10px] text-slate-500">Dibuje su firma en el recuadro y presione enviar.</p>
+      </div>
+      <button type="button" onclick="submitClientSignature()" class="w-full sm:w-auto px-5 py-2.5 bg-[#25D366] hover:bg-[#20ba5a] active:scale-95 text-white font-black text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 transition">
+        <i class="fa-brands fa-whatsapp text-base"></i> Confirmar Firma y Enviar por WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- Notificación Toast -->
+  <div id="toast" class="no-print fixed bottom-4 right-4 z-50 bg-slate-900 text-white px-3 py-2 rounded-lg shadow-2xl text-xs font-bold transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMsg">Acción completada</span>
+  </div>
+
+  <script>
+    let isPreviewMode = false;
+    let isClientMode = false;
+    let currentPaperSize = 'legal';
+    let originalTitle = document.title;
+    let finCondRatioIndex = 0;
+    const finCondRatios = [
+      { fin: 'md:col-span-5', cond: 'md:col-span-7', badge: '5:7' },
+      { fin: 'md:col-span-6', cond: 'md:col-span-6', badge: '6:6' },
+      { fin: 'md:col-span-4', cond: 'md:col-span-8', badge: '4:8' },
+      { fin: 'md:col-span-7', cond: 'md:col-span-5', badge: '7:5' }
+    ];
+
+    let contractItems = [
+      {
+        id: 1,
+        qty: 2,
+        desc: "Puerta de closet corrediza doble Full Glass Color Blanco Con Cristal Blanco Leche Incluye Rectificación De Medidas Y Instalacion Basica\n• CLOSET PASILLO 54” ¾ X 94” 7/8\n• CLOSET MASTER 83” ¾ X 95” ½",
+        total: 2349.99
+      }
+    ];
+
+    const canvases = {};
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function generateContractCode() {
+      return `CV-${Math.floor(100000 + Math.random() * 900000)}`;
+    }
+
+    function generateNewContractNumber() {
+      const code = generateContractCode();
+      document.getElementById('contractNumber').value = code;
+      document.getElementById('contractNumberPrint').innerText = code;
+      showToast(`Nuevo número: ${code}`);
+    }
+
+    /* =====================================================================
+       ENLACE AUTOSUFICIENTE: CODIFICACIÓN / DECODIFICACIÓN
+       ===================================================================== */
+    function encodePayload(obj) {
+      const str = JSON.stringify(obj);
+      const bytes = new TextEncoder().encode(str);
+      let binary = '';
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return encodeURIComponent(btoa(binary));
+    }
+
+    function decodePayload(encoded) {
+      const binary = atob(decodeURIComponent(encoded));
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function copyClientLink() {
+      syncItemsFromInputs();
+      calculateTotals();
+
+      const payload = {
+        num: document.getElementById('contractNumber').value.trim(),
+        date: document.getElementById('contractDate').value,
+        client: {
+          name: document.getElementById('clientName').value.trim(),
+          phone: document.getElementById('clientPhone').value.trim(),
+          email: document.getElementById('clientEmail').value.trim(),
+          addr: document.getElementById('clientAddress').value.trim()
+        },
+        items: contractItems,
+        chkCard: document.getElementById('chkCard').checked,
+        chkKlarna: document.getElementById('chkKlarna').checked,
+        depositPaid: document.getElementById('inputDepositPaid').value,
+        payMethod: document.getElementById('paymentMethod').value,
+        payUrl: document.getElementById('inputPaymentUrl').value.trim(),
+        paper: currentPaperSize
+      };
+
+      const encoded = encodePayload(payload);
+      const clientUrl = `${window.location.origin}${window.location.pathname}?modo=cliente&d=${encoded}`;
+
+      navigator.clipboard.writeText(clientUrl).then(() => {
+        showToast('¡Link para cliente copiado al portapapeles!');
+      }).catch(() => {
+        prompt('Copie el siguiente enlace para su cliente:', clientUrl);
+      });
+    }
+
+    function loadFromPayload(data) {
+      if (!data) return;
+      if (data.num) {
+        document.getElementById('contractNumber').value = data.num;
+        document.getElementById('contractNumberPrint').innerText = data.num;
+      }
+      if (data.date) {
+        document.getElementById('contractDate').value = data.date;
+        document.getElementById('deliveryDate').value = data.date;
+      }
+      if (data.client) {
+        document.getElementById('clientName').value = data.client.name || '';
+        document.getElementById('clientPhone').value = data.client.phone || '';
+        document.getElementById('clientEmail').value = data.client.email || '';
+        document.getElementById('clientAddress').value = data.client.addr || '';
+      }
+      if (Array.isArray(data.items) && data.items.length > 0) {
+        contractItems = data.items;
+      }
+      if (typeof data.chkCard === 'boolean') document.getElementById('chkCard').checked = data.chkCard;
+      if (typeof data.chkKlarna === 'boolean') document.getElementById('chkKlarna').checked = data.chkKlarna;
+      if (data.depositPaid !== undefined) document.getElementById('inputDepositPaid').value = data.depositPaid;
+      if (data.payMethod) document.getElementById('paymentMethod').value = data.payMethod;
+      if (data.payUrl !== undefined) document.getElementById('inputPaymentUrl').value = data.payUrl;
+      if (data.paper) setPaperSize(data.paper);
+
+      syncDates();
+      syncCustomerPrint();
+      syncPaymentMethod();
+      syncPaymentLink();
+      renderTable();
+      calculateTotals();
+    }
+
+    function applyClientModeRestrictions() {
+      isClientMode = true;
+      document.body.classList.add('client-mode');
+      document.getElementById('clientBottomBar').classList.remove('hidden');
+
+      // Desactivar contenteditable en todo el contrato
+      document.querySelectorAll('.editable-area').forEach(el => {
+        el.removeAttribute('contenteditable');
+        el.setAttribute('tabindex', '-1');
+      });
+
+      // Ocultar bloque de pago si no hay enlace
+      const payUrl = (document.getElementById('inputPaymentUrl').value || '').trim();
+      const payContainer = document.getElementById('paymentLinkContainer');
+      if (!payUrl && payContainer) {
+        payContainer.style.display = 'none';
+      }
+
+      syncItemsPrint();
+      syncCustomerPrint();
+      syncDates();
+      syncPaymentMethod();
+      syncPaymentLink();
+    }
+
+    window.onload = function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('contractDate').value = today;
+      document.getElementById('deliveryDate').value = today;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const isClientParam = urlParams.get('modo') === 'cliente';
+      const encodedData = urlParams.get('d');
+
+      if (encodedData) {
+        try {
+          const parsed = decodePayload(encodedData);
+          loadFromPayload(parsed);
+        } catch (e) {
+          console.error("Error al cargar datos:", e);
+        }
+      } else {
+        const code = generateContractCode();
+        document.getElementById('contractNumber').value = code;
+        document.getElementById('contractNumberPrint').innerText = code;
+        renderTable();
+        calculateTotals();
+      }
+
+      syncDates();
+      syncCustomerPrint();
+      syncPaymentLink();
+
+      initSignatureCanvas('signatureClient');
+      initSignatureCanvas('signatureDelivery');
+      initDragAndDrop();
+
+      if (isClientParam) {
+        applyClientModeRestrictions();
+      }
+
+      document.getElementById('clientName').addEventListener('input', function(e) {
+        const val = e.target.value.trim() || '---';
+        document.getElementById('sigClientNamePreview').innerText = val;
+        document.getElementById('clientNamePrint').innerText = val;
+      });
+
+      ['clientPhone', 'clientEmail', 'clientAddress', 'contractNumber'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', syncCustomerPrint);
+      });
+    };
+
+    /* =====================================================================
+       ENLACE DE PAGO DIGITAL
+       ===================================================================== */
+    function syncPaymentLink() {
+      const urlInput = document.getElementById('inputPaymentUrl');
+      const btn = document.getElementById('btnPayOnline');
+      const printSpan = document.getElementById('paymentUrlPrint');
+      const rawUrl = urlInput ? urlInput.value.trim() : '';
+
+      let formattedUrl = rawUrl;
+      if (formattedUrl && !formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+
+      if (btn) {
+        if (formattedUrl) {
+          btn.href = formattedUrl;
+          btn.classList.remove('opacity-40', 'pointer-events-none');
+        } else {
+          btn.href = '#';
+          btn.classList.add('opacity-40', 'pointer-events-none');
+        }
+      }
+      if (printSpan) {
+        printSpan.innerText = rawUrl || '---';
+      }
+    }
+
+    function testPaymentLink() {
+      const urlInput = document.getElementById('inputPaymentUrl');
+      let url = urlInput ? urlInput.value.trim() : '';
+      if (!url) {
+        showToast('Ingrese un enlace de pago');
+        return;
+      }
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = `https://${url}`;
+      }
+      window.open(url, '_blank');
+    }
+
+    function setPaymentPreset(type) {
+      const input = document.getElementById('inputPaymentUrl');
+      if (!input) return;
+      if (type === 'ath') {
+        input.value = 'https://athmovil.com';
+      } else if (type === 'custom') {
+        input.value = '';
+      }
+      syncPaymentLink();
+      showToast(type === 'ath' ? 'Enlace ATH Móvil asignado' : 'Enlace despejado');
+    }
+
+    /* =====================================================================
+       SELECTOR DE TIPO DE PAPEL
+       ===================================================================== */
+    function setPaperSize(size) {
+      currentPaperSize = (size === 'letter') ? 'letter' : 'legal';
+      const sheet = document.getElementById('contractSheet');
+      const btnLegal = document.getElementById('btnPaperLegal');
+      const btnLetter = document.getElementById('btnPaperLetter');
+      const lblHeader = document.getElementById('lblHeaderPaper');
+      const lblPreview = document.getElementById('lblPreviewBannerPaper');
+      const dynStyle = document.getElementById('dynamicPageStyle');
+
+      if (currentPaperSize === 'letter') {
+        sheet.classList.remove('paper-legal');
+        sheet.classList.add('paper-letter');
+        if (btnLetter) btnLetter.className = 'px-2 py-1 text-[11px] font-black rounded-md bg-brand-blue text-white shadow-xs transition';
+        if (btnLegal) btnLegal.className = 'px-2 py-1 text-[11px] font-bold rounded-md text-slate-700 hover:bg-slate-200 transition';
+        if (lblHeader) lblHeader.innerText = 'Papel Carta (8.5” x 11”)';
+        if (lblPreview) lblPreview.innerText = 'Vista Previa — Hoja Tamaño Carta (8.5” x 11”)';
+        if (dynStyle) dynStyle.innerHTML = `@media print { @page { margin: 4.5mm 5.5mm; size: letter portrait; } }`;
+
+        updateZoneVar('gap', 5, 'px');
+        updateZoneVar('conditionsFont', 7.6, 'px');
+        updateZoneVar('conditionsLine', 1.15, '');
+      } else {
+        sheet.classList.remove('paper-letter');
+        sheet.classList.add('paper-legal');
+        if (btnLegal) btnLegal.className = 'px-2 py-1 text-[11px] font-black rounded-md bg-brand-blue text-white shadow-xs transition';
+        if (btnLetter) btnLetter.className = 'px-2 py-1 text-[11px] font-bold rounded-md text-slate-700 hover:bg-slate-200 transition';
+        if (lblHeader) lblHeader.innerText = 'Papel Legal (8.5” x 14”)';
+        if (lblPreview) lblPreview.innerText = 'Vista Previa — Hoja Tamaño Legal (8.5” x 14”)';
+        if (dynStyle) dynStyle.innerHTML = `@media print { @page { margin: 5mm 6mm; size: legal portrait; } }`;
+
+        updateZoneVar('gap', 8, 'px');
+        updateZoneVar('conditionsFont', 8.2, 'px');
+        updateZoneVar('conditionsLine', 1.22, '');
+      }
+
+      window.dispatchEvent(new Event('resize'));
+    }
+
+    function updateZoneVar(name, val, unit) {
+      const cssMap = {
+        gap: '--zone-gap',
+        headerTitle: '--zone-header-title',
+        clientFont: '--zone-client-font',
+        itemsFont: '--zone-items-font',
+        conditionsFont: '--zone-conditions-font',
+        conditionsLine: '--zone-conditions-line',
+        financialFont: '--zone-financial-font',
+        sigHeight: '--zone-sig-height'
+      };
+      if (cssMap[name]) {
+        document.documentElement.style.setProperty(cssMap[name], `${val}${unit}`);
+      }
+      const badge = document.getElementById(`badge_${name}`);
+      if (badge) badge.innerText = `${val}${unit}`;
+      const range = document.getElementById(`range_${name}`);
+      if (range) range.value = val;
+      if (name === 'sigHeight') window.dispatchEvent(new Event('resize'));
+    }
+
+    function toggleSizePanel() {
+      document.getElementById('zoneSizePanel').classList.toggle('hidden');
+    }
+
+    function resetZoneSizes() {
+      updateZoneVar('gap', currentPaperSize === 'letter' ? 5 : 8, 'px');
+      updateZoneVar('headerTitle', 19, 'px');
+      updateZoneVar('clientFont', 11.5, 'px');
+      updateZoneVar('itemsFont', 12, 'px');
+      updateZoneVar('conditionsFont', currentPaperSize === 'letter' ? 7.6 : 8.2, 'px');
+      updateZoneVar('conditionsLine', currentPaperSize === 'letter' ? 1.15 : 1.22, '');
+      updateZoneVar('financialFont', 11.5, 'px');
+      updateZoneVar('sigHeight', 56, 'px');
+      document.querySelectorAll('.movable-section').forEach(sec => {
+        sec.style.marginBottom = '';
+        sec.style.minHeight = '';
+      });
+      document.querySelectorAll('[id^="h_input_"]').forEach(inp => inp.value = '');
+      showToast('Tamaños restablecidos');
+    }
+
+    /* =====================================================================
+       ALTURA INDIVIDUAL, ARRASTRE Y ACOPLAMIENTO
+       ===================================================================== */
+    function setSectionHeight(sectionId, val) {
+      const sec = document.getElementById(sectionId);
+      if (!sec) return;
+      val = parseFloat(val);
+      if (isNaN(val) || val <= 0) {
+        sec.style.minHeight = '';
+        const input = document.getElementById(`h_input_${sectionId}`);
+        if (input) input.value = '';
+      } else {
+        sec.style.minHeight = `${val}px`;
+        const input = document.getElementById(`h_input_${sectionId}`);
+        if (input) input.value = Math.round(val);
+      }
+      if (sectionId === 'sec_signatures') window.dispatchEvent(new Event('resize'));
+    }
+
+    function adjustSectionHeight(sectionId, delta) {
+      const sec = document.getElementById(sectionId);
+      if (!sec) return;
+      const current = parseFloat(sec.style.minHeight) || sec.getBoundingClientRect().height;
+      setSectionHeight(sectionId, Math.max(30, current + delta));
+    }
+
+    function resetSectionHeight(sectionId) {
+      setSectionHeight(sectionId, null);
+      showToast('Altura en Automático');
+    }
+
+    let isResizingSection = false;
+    let resizeTargetSec = null;
+    let resizeStartY = 0;
+    let resizeStartHeight = 0;
+
+    function startResizingSection(sectionId, e) {
+      const sec = document.getElementById(sectionId);
+      if (!sec) return;
+      isResizingSection = true;
+      resizeTargetSec = sec;
+      resizeStartY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+      resizeStartHeight = sec.getBoundingClientRect().height;
+      document.body.style.cursor = 'row-resize';
+      window.addEventListener('mousemove', handleSectionResizing);
+      window.addEventListener('touchmove', handleSectionResizing, { passive: false });
+      window.addEventListener('mouseup', stopSectionResizing);
+      window.addEventListener('touchend', stopSectionResizing);
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function handleSectionResizing(e) {
+      if (!isResizingSection || !resizeTargetSec) return;
+      const currentY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+      const newHeight = Math.max(35, resizeStartHeight + (currentY - resizeStartY));
+      resizeTargetSec.style.minHeight = `${Math.round(newHeight)}px`;
+      const input = document.getElementById(`h_input_${resizeTargetSec.id}`);
+      if (input) input.value = Math.round(newHeight);
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function stopSectionResizing() {
+      isResizingSection = false;
+      resizeTargetSec = null;
+      document.body.style.cursor = '';
+      window.removeEventListener('mousemove', handleSectionResizing);
+      window.removeEventListener('touchmove', handleSectionResizing);
+      window.removeEventListener('mouseup', stopSectionResizing);
+      window.removeEventListener('touchend', stopSectionResizing);
+    }
+
+    function toggleCoupleSection(sectionId) {
+      const sec = document.getElementById(sectionId);
+      const btn = document.getElementById(`btn_couple_${sectionId}`);
+      if (!sec || !btn) return;
+      const isCoupled = sec.classList.toggle('coupled-section');
+      if (isCoupled) {
+        btn.className = 'zone-quick-btn !bg-indigo-600 !text-white !border-indigo-700';
+        btn.innerHTML = '<i class="fa-solid fa-unlink text-[8px]"></i> Separar';
+        showToast(`"${sec.dataset.sectionName}" acoplada`);
+      } else {
+        btn.className = 'zone-quick-btn !bg-blue-50 !text-blue-700 !border-blue-200';
+        btn.innerHTML = '<i class="fa-solid fa-link text-[8px]"></i> Juntar';
+        showToast(`"${sec.dataset.sectionName}" separada`);
+      }
+    }
+
+    /* =====================================================================
+       ADJUNTOS MULTIMEDIA POR SECCIÓN
+       ===================================================================== */
+    function attachImageToSection(sectionId, inputEl) {
+      if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const container = document.getElementById(`attachment_container_${sectionId}`);
+        const imgEl = document.getElementById(`attachment_img_${sectionId}`);
+        if (container && imgEl) {
+          imgEl.src = e.target.result;
+          container.classList.remove('hidden');
+          showToast('Imagen adjuntada correctamente');
+        }
+      };
+      reader.readAsDataURL(inputEl.files[0]);
+    }
+
+    function removeAttachment(sectionId) {
+      const container = document.getElementById(`attachment_container_${sectionId}`);
+      const imgEl = document.getElementById(`attachment_img_${sectionId}`);
+      if (container && imgEl) {
+        imgEl.src = '';
+        container.classList.add('hidden');
+        showToast('Adjunto eliminado');
+      }
+    }
+
+    function setAttachmentSize(sectionId, sizeClass) {
+      const imgEl = document.getElementById(`attachment_img_${sectionId}`);
+      if (!imgEl) return;
+      imgEl.classList.remove('max-h-24', 'max-h-40', 'max-h-64', 'max-h-96', 'w-full');
+      if (sizeClass === 'sm') imgEl.classList.add('max-h-24');
+      else if (sizeClass === 'md') imgEl.classList.add('max-h-40');
+      else if (sizeClass === 'lg') imgEl.classList.add('max-h-64');
+      else if (sizeClass === 'full') imgEl.classList.add('w-full', 'max-h-96');
+    }
+
+    /* =====================================================================
+       REUBICACIÓN Y REORDENAMIENTO
+       ===================================================================== */
+    function moveSection(sectionId, direction) {
+      const sec = document.getElementById(sectionId);
+      if (!sec) return;
+      const parent = sec.parentElement;
+
+      syncSignaturesToImages();
+      const clientData = canvases['signatureClient'] ? canvases['signatureClient'].canvas.toDataURL() : null;
+      const deliveryData = canvases['signatureDelivery'] ? canvases['signatureDelivery'].canvas.toDataURL() : null;
+
+      if (direction === 'up' && sec.previousElementSibling && sec.previousElementSibling.classList.contains('movable-section')) {
+        parent.insertBefore(sec, sec.previousElementSibling);
+        showToast(`"${sec.dataset.sectionName}" movido arriba`);
+      } else if (direction === 'down' && sec.nextElementSibling && sec.nextElementSibling.classList.contains('movable-section')) {
+        parent.insertBefore(sec.nextElementSibling, sec);
+        showToast(`"${sec.dataset.sectionName}" movido abajo`);
+      }
+
+      restoreSignatures(clientData, deliveryData);
+    }
+
+    function resetSectionOrder() {
+      const parent = document.getElementById('contractSheet');
+      const defaultOrder = ['sec_header', 'sec_client', 'sec_items', 'sec_fin_cond', 'sec_signatures', 'sec_footer'];
+      syncSignaturesToImages();
+      const clientData = canvases['signatureClient'] ? canvases['signatureClient'].canvas.toDataURL() : null;
+      const deliveryData = canvases['signatureDelivery'] ? canvases['signatureDelivery'].canvas.toDataURL() : null;
+
+      defaultOrder.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) parent.appendChild(el);
+      });
+      restoreSignatures(clientData, deliveryData);
+      showToast('Orden original restablecido');
+    }
+
+    function initDragAndDrop() {
+      const sections = document.querySelectorAll('.movable-section');
+      let draggedEl = null;
+      sections.forEach(sec => {
+        const handle = sec.querySelector('.section-drag-handle');
+        if (!handle) return;
+        handle.setAttribute('draggable', 'true');
+        handle.addEventListener('dragstart', (e) => {
+          draggedEl = sec;
+          sec.classList.add('is-dragging');
+          syncSignaturesToImages();
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        sec.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (!draggedEl || draggedEl === sec) return;
+          const rect = sec.getBoundingClientRect();
+          const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+          sec.parentElement.insertBefore(draggedEl, next ? sec.nextSibling : sec);
+        });
+        handle.addEventListener('dragend', () => {
+          if (draggedEl) draggedEl.classList.remove('is-dragging');
+          draggedEl = null;
+        });
+      });
+    }
+
+    function swapFinCondColumns() {
+      const grid = document.getElementById('finCondGrid');
+      const fin = document.getElementById('col_financial');
+      const cond = document.getElementById('col_conditions');
+      if (!grid || !fin || !cond) return;
+      if (grid.firstElementChild === fin) {
+        grid.appendChild(fin);
+        showToast('Finanzas a la derecha');
+      } else {
+        grid.appendChild(cond);
+        showToast('Finanzas a la izquierda');
+      }
+    }
+
+    function cycleFinCondRatio() {
+      finCondRatioIndex = (finCondRatioIndex + 1) % finCondRatios.length;
+      const r = finCondRatios[finCondRatioIndex];
+      const fin = document.getElementById('col_financial');
+      const cond = document.getElementById('col_conditions');
+      finCondRatios.forEach(item => {
+        fin.classList.remove(item.fin);
+        cond.classList.remove(item.cond);
+      });
+      fin.classList.add(r.fin);
+      cond.classList.add(r.cond);
+      document.getElementById('lbl_ratio_badge').innerText = r.badge;
+      showToast(`Proporción: ${r.badge}`);
+    }
+
+    function swapSignatures() {
+      const grid = document.getElementById('signaturesGrid');
+      const client = document.getElementById('col_sig_client');
+      const del = document.getElementById('col_sig_delivery');
+      syncSignaturesToImages();
+      const clientData = canvases['signatureClient'] ? canvases['signatureClient'].canvas.toDataURL() : null;
+      const deliveryData = canvases['signatureDelivery'] ? canvases['signatureDelivery'].canvas.toDataURL() : null;
+
+      if (grid.firstElementChild === client) grid.appendChild(client);
+      else grid.appendChild(del);
+
+      restoreSignatures(clientData, deliveryData);
+      showToast('Posición de firmas intercambiada');
+    }
+
+    function restoreSignatures(clientData, deliveryData) {
+      if (clientData && canvases['signatureClient']) {
+        const img1 = new Image();
+        img1.onload = () => canvases['signatureClient'].ctx.drawImage(img1, 0, 0);
+        img1.src = clientData;
+      }
+      if (deliveryData && canvases['signatureDelivery']) {
+        const img2 = new Image();
+        img2.onload = () => canvases['signatureDelivery'].ctx.drawImage(img2, 0, 0);
+        img2.src = deliveryData;
+      }
+    }
+
+    /* =====================================================================
+       CLÁUSULAS, CÁLCULOS Y EXPORTACIÓN
+       ===================================================================== */
+    function addClause() {
+      const list = document.getElementById('conditionsList');
+      const count = list.children.length + 1;
+      const li = document.createElement('li');
+      li.className = 'editable-area';
+      li.contentEditable = 'true';
+      li.innerHTML = `<strong>Nueva Cláusula ${count}:</strong> Ingrese el texto específico aquí...`;
+      list.appendChild(li);
+      li.focus();
+    }
+
+    function removeLastClause() {
+      const list = document.getElementById('conditionsList');
+      if (list.children.length > 1) list.removeChild(list.lastElementChild);
+    }
+
+    function syncCustomerPrint() {
+      document.getElementById('contractNumberPrint').innerText = document.getElementById('contractNumber').value.trim() || 'CV-000000';
+      document.getElementById('clientNamePrint').innerText = document.getElementById('clientName').value.trim() || '---';
+      document.getElementById('clientPhonePrint').innerText = document.getElementById('clientPhone').value.trim() || '---';
+      document.getElementById('clientEmailPrint').innerText = document.getElementById('clientEmail').value.trim() || '---';
+      document.getElementById('clientAddressPrint').innerText = document.getElementById('clientAddress').value.trim() || '---';
+      document.getElementById('sigClientNamePreview').innerText = document.getElementById('clientName').value.trim() || '---';
+    }
+
+    function syncDates() {
+      document.getElementById('contractDatePrint').innerText = document.getElementById('contractDate').value || '---';
+      document.getElementById('deliveryDatePrint').innerText = document.getElementById('deliveryDate').value || '---';
+    }
+
+    function syncPaymentMethod() {
+      document.getElementById('paymentMethodPrint').innerText = document.getElementById('paymentMethod').value;
+    }
+
+    function toggleFee(type) {
+      if (type === 'card' && document.getElementById('chkCard').checked) document.getElementById('chkKlarna').checked = false;
+      if (type === 'klarna' && document.getElementById('chkKlarna').checked) document.getElementById('chkCard').checked = false;
+      calculateTotals();
+    }
+
+    function applyFiftyPercent() {
+      const subtotal = contractItems.reduce((acc, curr) => acc + (curr.total || 0), 0);
+      const ivu = subtotal * 0.115;
+      let surcharge = 0;
+      if (document.getElementById('chkCard').checked) surcharge += (subtotal + ivu) * 0.043;
+      if (document.getElementById('chkKlarna').checked) surcharge += (subtotal + ivu) * 0.0899;
+      const fifty = ((subtotal + ivu + surcharge) * 0.50).toFixed(2);
+      document.getElementById('inputDepositPaid').value = fifty;
+      calculateTotals();
+      showToast(`50% aplicado: $${fifty}`);
+    }
+
+    function syncItemsFromInputs() {
+      contractItems.forEach((item, index) => {
+        const descInput = document.getElementById(`item_desc_input_${index}`);
+        if (descInput) item.desc = descInput.value;
+        const qtyInput = document.getElementById(`item_qty_input_${index}`);
+        if (qtyInput) item.qty = Math.max(1, parseInt(qtyInput.value) || 1);
+        const totalInput = document.getElementById(`item_total_input_${index}`);
+        if (totalInput) item.total = parseFloat(totalInput.value) || 0;
+      });
+    }
+
+    function syncItemsPrint() {
+      syncItemsFromInputs();
+      contractItems.forEach((item, index) => {
+        const descPrint = document.getElementById(`item_desc_print_${index}`);
+        if (descPrint) descPrint.innerText = item.desc;
+        const qtyPrint = document.getElementById(`item_qty_print_${index}`);
+        if (qtyPrint) qtyPrint.innerText = item.qty;
+        const totalPrint = document.getElementById(`item_total_print_${index}`);
+        if (totalPrint) totalPrint.innerText = `$${item.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      });
+    }
+
+    function togglePreviewMode() {
+      isPreviewMode = !isPreviewMode;
+      const body = document.body;
+      const btn = document.getElementById('btnTogglePreview');
+      const lbl = document.getElementById('lblPreviewBtn');
+      const panel = document.getElementById('zoneSizePanel');
+
+      if (isPreviewMode) {
+        if (panel) panel.classList.add('hidden');
+        syncDates();
+        syncCustomerPrint();
+        syncPaymentMethod();
+        syncPaymentLink();
+        syncItemsPrint();
+        syncSignaturesToImages();
+        body.classList.add('preview-mode');
+        btn.classList.add('bg-emerald-600', 'text-white');
+        lbl.innerText = 'Modo Edición';
+      } else {
+        body.classList.remove('preview-mode');
+        btn.classList.remove('bg-emerald-600', 'text-white');
+        lbl.innerText = 'Vista Previa';
+      }
+    }
+
+    function isCanvasBlank(id) {
+      const c = document.getElementById(id);
+      if (!c) return true;
+      const ctx = c.getContext('2d');
+      const pixelBuffer = new Uint32Array(ctx.getImageData(0, 0, c.width, c.height).data.buffer);
+      return !pixelBuffer.some(color => color !== 0);
+    }
+
+    /* Validar y enviar firma del cliente por WhatsApp al taller */
+    async function submitClientSignature() {
+      if (isCanvasBlank('signatureClient')) {
+        alert("Por favor, dibuje su firma en el recuadro antes de confirmar y enviar el contrato.");
+        document.getElementById('col_sig_client').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      showToast('Generando contrato firmado...');
+      syncSignaturesToImages();
+
+      // Preparar captura de imagen
+      const sheet = document.getElementById('contractSheet');
+      const canvas = await html2canvas(sheet, {
+        scale: 2.2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: 816
+      });
+
+      const contractNum = document.getElementById('contractNumber').value.trim() || 'CV-000000';
+      const clientName = document.getElementById('clientName').value.trim() || 'Cliente';
+      const baseName = `${contractNum} - ${clientName} - Firmado`;
+
+      // Descarga de copia en el teléfono
+      const link = document.createElement('a');
+      link.download = `${baseName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+
+      // Redirección directa a WhatsApp del taller
+      const workshopPhone = '17872428699';
+      const msg = `Hola CV Puertas Ventanas & Mas,\n\nHe firmado formalmente el contrato digital *${contractNum}* a nombre de *${clientName}*.\n• Total: ${document.getElementById('lblTotal').innerText}\n• Balance: ${document.getElementById('lblBalance').innerText}\n\nAdjunto la imagen descargada de mi contrato firmado para comenzar la orden.`;
+
+      setTimeout(() => {
+        window.open(`https://api.whatsapp.com/send?phone=${workshopPhone}&text=${encodeURIComponent(msg)}`, '_blank');
+      }, 700);
+    }
+
+    function initSignatureCanvas(id) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        const temp = document.createElement('canvas');
+        temp.width = canvas.width;
+        temp.height = canvas.height;
+        if (canvas.width > 0 && canvas.height > 0) temp.getContext('2d').drawImage(canvas, 0, 0);
+
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.4;
+        if (temp.width > 0 && temp.height > 0) ctx.drawImage(temp, 0, 0, rect.width, rect.height);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+
+      let isDrawing = false, lastX = 0, lastY = 0;
+      function getPos(e) {
+        const r = canvas.getBoundingClientRect();
+        const clientX = e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - r.left, y: clientY - r.top };
+      }
+
+      canvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const p = getPos(e);
+        ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+        lastX = p.x; lastY = p.y;
+      });
+      window.addEventListener('mouseup', () => isDrawing = false);
+
+      canvas.addEventListener('touchstart', (e) => { isDrawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; if (e.cancelable) e.preventDefault(); }, { passive: false });
+      canvas.addEventListener('touchmove', (e) => {
+        if (!isDrawing) return;
+        const p = getPos(e);
+        ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+        lastX = p.x; lastY = p.y;
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+      window.addEventListener('touchend', () => isDrawing = false);
+
+      canvases[id] = { canvas, ctx };
+    }
+
+    function clearCanvas(id) {
+      if (canvases[id]) {
+        canvases[id].ctx.clearRect(0, 0, canvases[id].canvas.width, canvases[id].canvas.height);
+        const img = document.getElementById(`img_${id}`);
+        if (img) img.src = '';
+        showToast("Firma borrada");
+      }
+    }
+
+    function syncSignaturesToImages() {
+      ['signatureClient', 'signatureDelivery'].forEach(id => {
+        const item = canvases[id];
+        const img = document.getElementById(`img_${id}`);
+        if (item && img) img.src = item.canvas.toDataURL('image/png');
+      });
+    }
+
+    function getContractBaseName() {
+      const num = document.getElementById('contractNumber').value.trim() || 'CV-000000';
+      const rawName = document.getElementById('clientName').value.trim() || 'Cliente';
+      return `${num} - ${rawName.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s_-]/g, '').trim()} - CV Puertas Ventanas`;
+    }
+
+    function prepareAndPrint() {
+      syncDates();
+      syncCustomerPrint();
+      syncPaymentMethod();
+      syncPaymentLink();
+      syncItemsPrint();
+      syncSignaturesToImages();
+      document.title = getContractBaseName();
+      window.print();
+      setTimeout(() => document.title = originalTitle, 2000);
+    }
+
+    async function generateContractCanvas() {
+      syncDates();
+      syncCustomerPrint();
+      syncPaymentMethod();
+      syncPaymentLink();
+      syncItemsPrint();
+      syncSignaturesToImages();
+      const wasPreview = document.body.classList.contains('preview-mode');
+      if (!wasPreview) document.body.classList.add('preview-mode');
+      await new Promise(r => setTimeout(r, 80));
+
+      const canvas = await html2canvas(document.getElementById('contractSheet'), {
+        scale: 2.2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: 816
+      });
+
+      if (!wasPreview) document.body.classList.remove('preview-mode');
+      return canvas;
+    }
+
+    async function downloadContractPNG() {
+      showToast('Generando PNG...');
+      const canvas = await generateContractCanvas();
+      const link = document.createElement('a');
+      link.download = `${getContractBaseName()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('¡PNG descargado!');
+    }
+
+    async function shareViaWhatsApp() {
+      showToast('Preparando WhatsApp...');
+      const canvas = await generateContractCanvas();
+      const baseName = getContractBaseName();
+      const phone = (document.getElementById('clientPhone').value || '').replace(/\D/g, '');
+      const fullPhone = phone.length === 10 ? '1' + phone : phone;
+      const payUrl = document.getElementById('inputPaymentUrl') ? document.getElementById('inputPaymentUrl').value.trim() : '';
+      const payLine = payUrl ? `\n💳 *Enlace de Pago:* ${payUrl}` : '';
+      const rawMsg = `📄 *CV PUERTAS VENTANAS & MAS*\n*Contrato:* ${document.getElementById('contractNumber').value}\n*Cliente:* ${document.getElementById('clientName').value}\n• Total: ${document.getElementById('lblTotal').innerText}\n• Balance: ${document.getElementById('lblBalance').innerText}${payLine}\nAdjunto su contrato firmado en imagen (PNG).`;
+
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `${baseName}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ title: baseName, text: rawMsg, files: [file] });
+            return;
+          } catch (e) {}
+        }
+        const link = document.createElement('a');
+        link.download = `${baseName}.png`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        window.open(`https://api.whatsapp.com/send?phone=${fullPhone}&text=${encodeURIComponent(rawMsg)}`, '_blank');
+      }, 'image/png');
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('itemsTableBody');
+      tbody.innerHTML = '';
+      contractItems.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70';
+        tr.innerHTML = `
+          <td class="p-2 border-r border-slate-300 text-center align-top">
+            <input type="number" id="item_qty_input_${index}" min="1" value="${item.qty}" class="preview-hide no-print w-12 text-center border rounded font-black text-xs py-1" oninput="updateItem(${index}, 'qty', this.value)">
+            <span id="item_qty_print_${index}" class="print-only font-black text-xs">${item.qty}</span>
+          </td>
+          <td class="p-2 border-r border-slate-300 align-top">
+            <textarea id="item_desc_input_${index}" rows="3" class="preview-hide no-print w-full text-xs font-medium p-1 border rounded" oninput="updateItem(${index}, 'desc', this.value)">${escapeHtml(item.desc)}</textarea>
+            <div id="item_desc_print_${index}" class="print-only whitespace-pre-wrap text-[8.5px] leading-tight font-medium">${escapeHtml(item.desc)}</div>
+          </td>
+          <td class="p-2 border-r border-slate-300 text-right align-top">
+            <input type="number" id="item_total_input_${index}" step="0.01" value="${item.total.toFixed(2)}" class="preview-hide no-print w-full py-1 text-right border rounded font-mono font-black text-xs" oninput="updateItem(${index}, 'total', this.value)">
+            <div id="item_total_print_${index}" class="print-only font-mono font-black text-xs text-right">$${item.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          </td>
+          <td class="p-2 text-center align-middle preview-hide no-print">
+            <button type="button" onclick="removeItemRow(${index})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash-can"></i></button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateItem(index, field, value) {
+      if (field === 'qty') {
+        contractItems[index].qty = Math.max(1, parseInt(value) || 1);
+        const el = document.getElementById(`item_qty_print_${index}`);
+        if (el) el.innerText = contractItems[index].qty;
+      } else if (field === 'total') {
+        contractItems[index].total = parseFloat(value) || 0;
+        const el = document.getElementById(`item_total_print_${index}`);
+        if (el) el.innerText = `$${contractItems[index].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      } else if (field === 'desc') {
+        contractItems[index].desc = value;
+        const el = document.getElementById(`item_desc_print_${index}`);
+        if (el) el.innerText = value;
+      }
+      calculateTotals();
+    }
+
+    function addItemRow() {
+      syncItemsFromInputs();
+      contractItems.push({ id: Date.now(), qty: 1, desc: "Puerta / Ventana según especificaciones:\n• Modelo:\n• Medidas:", total: 0.00 });
+      renderTable();
+      calculateTotals();
+    }
+
+    function removeItemRow(index) {
+      if (contractItems.length <= 1) return;
+      syncItemsFromInputs();
+      contractItems.splice(index, 1);
+      renderTable();
+      calculateTotals();
+    }
+
+    function calculateTotals() {
+      const subtotal = contractItems.reduce((acc, curr) => acc + (curr.total || 0), 0);
+      document.getElementById('lblSubtotal').innerText = `$${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const ivu = subtotal * 0.115;
+      document.getElementById('lblIvu').innerText = `$${ivu.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      let surcharge = 0;
+      if (document.getElementById('chkCard').checked) {
+        const fee = (subtotal + ivu) * 0.043; surcharge += fee;
+        document.getElementById('lblCardFee').innerText = `$${fee.toFixed(2)}`;
+      } else document.getElementById('lblCardFee').innerText = 'N/A';
+
+      if (document.getElementById('chkKlarna').checked) {
+        const fee = (subtotal + ivu) * 0.0899; surcharge += fee;
+        document.getElementById('lblKlarnaFee').innerText = `$${fee.toFixed(2)}`;
+      } else document.getElementById('lblKlarnaFee').innerText = 'N/A';
+
+      const grandTotal = subtotal + ivu + surcharge;
+      document.getElementById('lblTotal').innerText = `$${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('lblMinDeposit').innerText = `$${(grandTotal * 0.50).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      const depositPaid = parseFloat(document.getElementById('inputDepositPaid').value) || 0;
+      document.getElementById('depositPaidPrint').innerText = `$${depositPaid.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      const balance = Math.max(0, grandTotal - depositPaid);
+      document.getElementById('lblBalance').innerText = `$${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('lblFinalBalancePaid').innerText = `$${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2200);
+    }
+
+    function loadSampleData() {
+      document.getElementById('contractNumber').value = 'CV-582914';
+      document.getElementById('clientName').value = 'JUAN NIEVEZ CASSAS';
+      document.getElementById('clientPhone').value = '787-605-3908';
+      document.getElementById('clientEmail').value = 'nievescassaslow@gmail.com';
+      document.getElementById('clientAddress').value = 'SAN JUAN';
+      document.getElementById('paymentMethod').value = 'ATH Móvil';
+      document.getElementById('chkCard').checked = false;
+      document.getElementById('chkKlarna').checked = false;
+      document.getElementById('inputPaymentUrl').value = '';
+      contractItems = [{
+        id: 1, qty: 2,
+        desc: "Puerta de closet corrediza doble Full Glass Color Blanco Con Cristal Blanco Leche Incluye Rectificación De Medidas Y Instalacion Basica\n• CLOSET PASILLO 54” ¾ X 94” 7/8\n• CLOSET MASTER 83” ¾ X 95” ½",
+        total: 2349.99
+      }];
+      calculateTotals();
+      applyFiftyPercent();
+      syncDates();
+      syncCustomerPrint();
+      syncPaymentMethod();
+      syncPaymentLink();
+      renderTable();
+      showToast("Datos de muestra cargados");
+    }
+
+    function clearContract() {
+      const code = generateContractCode();
+      document.getElementById('contractNumber').value = code;
+      document.getElementById('clientName').value = '';
+      document.getElementById('clientPhone').value = '';
+      document.getElementById('clientEmail').value = '';
+      document.getElementById('clientAddress').value = '';
+      document.getElementById('inputDepositPaid').value = '0.00';
+      document.getElementById('chkCard').checked = false;
+      document.getElementById('chkKlarna').checked = false;
+      document.getElementById('inputPaymentUrl').value = '';
+      syncPaymentLink();
+      contractItems = [{ id: 1, qty: 1, desc: "Puerta / Ventana según especificaciones:\n• Modelo:\n• Medidas:", total: 0.00 }];
+      clearCanvas('signatureClient');
+      clearCanvas('signatureDelivery');
+      syncDates();
+      syncCustomerPrint();
+      syncPaymentMethod();
+      renderTable();
+      calculateTotals();
+      showToast("Contrato limpio");
+    }
+  </script>
+</body>
+</html>
